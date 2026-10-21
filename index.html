@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Piscina 9 × 5 m — Opções</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --tinta: #1d2a33; --suave: #51616b; --linha: #e2e8ec; --acento: #0e7490; --chip: #eef3f5; --tela: #e9edf0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--tela); color: var(--tinta); font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+  .topo { position: fixed; left: 0; right: 0; top: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(255,255,255,0.94); border-bottom: 1px solid #d5dde2; }
+  .topo h1 { margin: 0; font-size: 16px; font-weight: 800; }
+  .ctr { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ctr button { font-family: inherit; font-size: 13px; font-weight: 700; min-height: 40px; min-width: 40px; padding: 0 12px; border: 1px solid #d5dde2; border-radius: 999px; background: #fff; color: var(--tinta); cursor: pointer; }
+  .ctr button:hover { background: var(--chip); }
+  .ctr .sep { width: 1px; height: 24px; background: #d5dde2; margin: 0 4px; }
+  #vp { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab; }
+  #vp.arrastando { cursor: grabbing; }
+  #world { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+  .titulo { position: absolute; left: 0; top: -190px; font-size: 72px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+  .board { position: absolute; top: 0; width: 1200px; background: #fff; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06); }
+  .faixa { position: absolute; left: 0; top: -30px; font-size: 15px; font-weight: 600; color: var(--suave); white-space: nowrap; }
+  .bin { position: relative; padding: 56px; display: flex; flex-direction: column; gap: 28px; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--acento); }
+  .bin h2 { margin: 6px 0; font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
+  .sub { margin: 0; font-size: 16px; color: var(--suave); }
+  .tog { position: absolute; right: 56px; top: 56px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .seg { display: flex; gap: 4px; padding: 4px; background: var(--chip); border-radius: 999px; }
+  .seg button { font-family: inherit; font-size: 13px; font-weight: 700; height: 44px; padding: 0 18px; border: none; border-radius: 999px; background: transparent; color: var(--tinta); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--tinta); color: #fff; }
+  .leg { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 13px; }
+  .leg .l { display: flex; gap: 14px; align-items: center; }
+  .leg span { display: inline-flex; align-items: center; gap: 6px; }
+  .linha { display: flex; gap: 40px; }
+  .esq { width: 700px; display: flex; flex-direction: column; gap: 10px; }
+  .esq h3 { margin: 0; font-size: 13px; font-weight: 700; color: var(--suave); }
+  .esq h3.c { margin-top: 8px; }
+  .esq svg { display: block; }
+  aside { flex: 1; display: flex; flex-direction: column; gap: 20px; padding-top: 30px; }
+  .volume { background: #e8f5fa; border-radius: 12px; padding: 16px 18px; }
+  .volume .rot { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #0e5f75; }
+  .volume .num { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
+  .volume .det { font-size: 13px; color: var(--suave); margin-top: 4px; }
+  dl { margin: 0; font-size: 14px; }
+  dl div { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--linha); }
+  dt { color: var(--suave); }
+  dd { margin: 0; font-weight: 700; text-align: right; }
+  .nota { margin: 0; font-size: 15px; line-height: 1.55; }
+  .rodape { margin: 0; font-size: 12px; line-height: 1.5; color: var(--suave); }
+  .dica { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 10; background: rgba(29,42,51,0.88); color: #fff; font-size: 12px; padding: 8px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; transition: opacity .6s; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1" stdDeviation="0.9" flood-color="#000" flood-opacity="0.3"/></filter>
+    <linearGradient id="gradC" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#86cde3"/><stop offset="1" stop-color="#3a9fc4"/></linearGradient>
+    <pattern id="wood" width="22" height="10" patternUnits="userSpaceOnUse"><rect width="22" height="10" fill="#b98b5e"/><rect x="20" width="2" height="10" fill="#a3784e"/></pattern>
+  </defs>
+</svg>
+<div class="topo">
+  <h1>Piscina 9 × 5 m</h1>
+  <div class="ctr" id="ctr">
+    <button type="button" id="zOut" aria-label="Diminuir zoom">−</button>
+    <button type="button" id="zIn" aria-label="Aumentar zoom">+</button>
+    <button type="button" id="fit">Ver todas</button>
+    <span class="sep"></span>
+  </div>
+</div>
+<div id="vp"><div id="world"><div class="titulo">Piscina 9 × 5 m — seis opções</div></div></div>
+<div class="dica" id="dica">Arraste para mover · pinça ou roda do mouse para zoom · toque duplo para focar</div>
+<script>
+(function () {
+  var AG = '#4fb3d4', AGC = '#3a9fc4', OF = '#2f8fa8', DECK = '#e3d8c5', COP = '#f4efe6', SHELL = '#9aa5ab', GROUND = '#d7c8ae', LINE = '#b9a988';
+  var P1 = '#c8e9f2', P2 = '#a9dcea', P3 = '#8ccfe2', SPAW = '#e2dccf', INK = '#1d2a33';
+
+  function R(x, y, w, h, f, ex) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + f + '" ' + (ex || '') + '/>'; }
+  function T(x, y, t) { return '<text x="' + x + '" y="' + y + '" font-size="12" font-weight="700" fill="' + INK + '">' + t + '</text>'; }
+  function chip(x, y, t) { var w = Math.round(t.length * 6.6 + 20); return R(x, y, w, 22, '#fff', 'rx="11"') + '<text x="' + (x + w / 2) + '" y="' + (y + 15) + '" text-anchor="middle" font-size="12" font-weight="600" fill="' + INK + '">' + t + '</text>'; }
+  function chip2(cx, cy, a, b) { var w = Math.round(Math.max(a.length, b.length) * 6.8 + 22), h = 38, x = cx - w / 2, y = cy - h / 2; return R(x, y, w, h, '#fff', 'rx="10"') + '<text x="' + cx + '" y="' + (y + 16) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + INK + '">' + a + '</text><text x="' + cx + '" y="' + (y + 31) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + INK + '">' + b + '</text>'; }
+  function chipC(cx, cy, t) { var w = Math.round(t.length * 7.4 + 26), h = 26; return R(cx - w / 2, cy - h / 2, w, h, '#fff', 'rx="13"') + '<text x="' + cx + '" y="' + (cy + 4.5) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + INK + '">' + t + '</text>'; }
+  function ln(x1, y1, x2, y2) { return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + INK + '" stroke-width="1.5"/>'; }
+  var DIMS = '<text x="370" y="14" text-anchor="middle" font-size="13" font-weight="700" fill="' + INK + '">9,00 m</text>' + ln(100, 24, 640, 24) + ln(100.75, 18, 100.75, 30) + ln(639.25, 18, 639.25, 30) +
+    '<text transform="translate(14 250) rotate(-90)" text-anchor="middle" font-size="13" font-weight="700" fill="' + INK + '">5,00 m</text>' + ln(24, 100, 24, 400) + ln(18, 100.75, 30, 100.75) + ln(18, 399.25, 30, 399.25);
+  function planBase(deck, agua) { return DIMS + R(40, 40, 660, 420, deck, 'rx="4"') + R(82, 82, 576, 336, COP) + R(100, 100, 540, 300, agua); }
+  function secBase(line) { return R(40, 36, 660, 124, GROUND) + R(40, 32, 660, 4, line || LINE); }
+  function dim(x, y1, y2) { return ln(x, y1, x, y2); }
+  function steps(x) { return R(x, 57, 21, 63, SHELL) + R(x + 21, 78, 21, 42, SHELL); }
+  var BCUT = secBase() + R(94, 36, 132, 24, SHELL) + R(214, 36, 432, 90, SHELL) + R(100, 36, 120, 18, AG) + R(220, 36, 420, 84, AG) + steps(220) + T(112, 78, '0,30 m') + dim(656, 36, 120) + T(652, 147, '1,40 m');
+  var OFURO_CANTO = R(100, 100, 120, 120, SPAW) + R(100, 100, 108, 108, OF) + R(100, 100, 108, 18, '#fff', 'opacity=".35"') + R(100, 118, 18, 90, '#fff', 'opacity=".35"') + R(100, 218, 120, 6, '#fff', 'opacity=".75"') + R(218, 100, 6, 124, '#fff', 'opacity=".75"');
+  var ROW = 'Ofurô 0,90 m · +0,30 m';
+  var RODAPE_OF = 'Pede bomba de hidro e aquecimento próprios, além de válvulas para separar os circuitos. Estimativas; confirme com o piscineiro.';
+  var RODAPE = 'Volume e vazão são estimativas para orientar o projeto. Confirme com o piscineiro.';
+
+  var OPC = [
+    { id: 'A', nome: 'Retangular clássica', sub: 'Profundidade única, escada romana de canto e deck em volta.', h: 1000,
+      plan: planBase(DECK, AG) + '<path d="M100 400V292A108 108 0 0 1 208 400Z" fill="' + P3 + '"/><path d="M100 400V328A72 72 0 0 1 172 400Z" fill="' + P2 + '"/><path d="M100 400V364A36 36 0 0 1 136 400Z" fill="' + P1 + '"/>' + chipC(370, 250, 'Profundidade 1,40 m') + chip(218, 366, 'Escada romana') + chip(540, 50, 'Deck 1,00 m'),
+      cortes: [{ t: 'CORTE LONGITUDINAL', svg: secBase() + R(94, 36, 552, 90, SHELL) + R(100, 36, 540, 84, AG) + dim(656, 36, 120) + T(652, 147, '1,40 m'),
+        figs: [['pe', 285, 18, 'a'], ['pe', 445, 18, 'a'], ['pe', 565, 18, 'a']], ag: [[100, 36, 540, 84]] }],
+      pessoas: [[190, 170, 'a'], [330, 150, 'a'], [470, 190, 'a'], [560, 140, 'a'], [560, 320, 'a'], [420, 330, 'a'], [150, 350, 'c'], [250, 300, 'c'], [300, 350, 'c']],
+      vol: '63.000 litros', volDet: '63 m³ · aproximado', lot: '6 adultos + 3 crianças',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Espelho d’água', '45 m²'], ['Profundidade', '1,40 m constante'], ['Perímetro', '28 m'], ['Filtro (ciclo 6 h)', '≈ 10,5 m³/h'], ['Entrada', 'Escada romana, 3 degraus']],
+      nota: 'A mais simples de executar e de manter. Fundo plano serve bem para nadar, brincar e hidroginástica.', rodape: RODAPE },
+    { id: 'B', nome: 'Com prainha', sub: 'Área rasa para convívio numa ponta e parte funda livre no resto.', h: 1000,
+      plan: planBase(DECK, AG) + R(100, 100, 120, 300, P1) + R(220, 100, 21, 300, P2) + R(241, 100, 21, 300, P3) + chip2(160, 250, 'Prainha', '0,30 m') + chipC(436, 250, 'Profundidade 1,40 m') + chip(272, 112, '2 degraus') + chip(540, 50, 'Deck 1,00 m'),
+      cortes: [{ t: 'CORTE LONGITUDINAL', svg: BCUT, figs: [['chao', 108, -2, 'a'], ['chao', 172, 18, 'c'], ['pe', 315, 18, 'a'], ['pe', 455, 18, 'a'], ['pe', 575, 18, 'a']], ag: [[100, 36, 120, 18], [220, 36, 420, 84]] }],
+      pessoas: [[140, 150, 'a'], [180, 350, 'a'], [190, 180, 'c'], [130, 320, 'c'], [195, 305, 'c'], [320, 180, 'a'], [450, 150, 'a'], [545, 250, 'a'], [380, 330, 'a'], [600, 165, 'a'], [560, 330, 'a']],
+      vol: '52.000 litros', volDet: '52 m³ · prainha 3.000 L + parte funda 49.000 L', lot: '8 adultos + 3 crianças',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Prainha', '2,00 × 5,00 m · 0,30 m'], ['Área funda', '7,00 × 5,00 m · 1,40 m'], ['Filtro (ciclo 6 h)', '≈ 9 m³/h'], ['Entrada', 'Pela prainha, 2 degraus']],
+      nota: 'A prainha vira o ponto de convívio: espreguiçadeiras dentro d’água e criança brincando no raso. Menos água para aquecer e tratar.', rodape: RODAPE },
+    { id: 'C', nome: 'Cascata + profundidade variável', sub: 'Fundo em rampa, escada lateral larga e lâmina d’água na parede oposta.', h: 1000,
+      plan: DIMS + R(40, 40, 660, 420, 'url(#wood)', 'rx="4"') + R(82, 82, 576, 336, COP) + R(100, 100, 540, 300, 'url(#gradC)') + R(298, 346, 144, 54, P3) + R(298, 364, 144, 36, P2) + R(298, 382, 144, 18, P1) + R(325, 82, 90, 18, '#5d6b73') + R(325, 100, 90, 12, '#fff', 'opacity=".75"') + chip(318, 122, 'Cascata 1,50 m') + chip(112, 112, 'Raso 1,20 m') + chip(532, 112, 'Fundo 1,80 m') + chip(318, 310, 'Escada 2,40 m') + chip(520, 50, 'Deck madeira 1,00 m'),
+      cortes: [{ t: 'CORTE LONGITUDINAL', svg: secBase('#a3784e') + '<polygon points="94,36 646,36 646,150 94,113.5" fill="' + SHELL + '"/><polygon points="100,36 640,36 640,144 100,108" fill="url(#gradC)"/>' + T(46, 78, '1,20 m') + dim(656, 36, 144) + T(652, 160, '1,80 m'),
+        figs: [['pe', 285, 19, 'a'], ['pe', 455, 31, 'a'], ['pe', 575, 38, 'a']], ag: [{ poly: '100,36 640,36 640,144 100,108', c: AGC }] }],
+      pessoas: [[200, 200, 'a'], [260, 290, 'a'], [470, 200, 'a'], [560, 290, 'a'], [600, 190, 'a'], [420, 280, 'a'], [150, 250, 'c'], [170, 330, 'c']],
+      vol: '66.000 litros', volDet: '66 m³ · aproximado', lot: '6 adultos + 2 crianças que nadam',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Profundidade', '1,20 → 1,80 m'], ['Filtro (ciclo 6 h)', '≈ 11 m³/h'], ['Entrada', 'Escada lateral, 3 degraus'], ['Cascata', 'Lâmina inox 1,50 m'], ['Deck', 'Madeira, 1,00 m']],
+      nota: 'Mais cenográfica. O lado de 1,80 m dá para ficar em pé com água no queixo, mas não é profundidade segura para salto de cabeça.', rodape: 'A cascata pede bomba própria. Volume e vazão são estimativas; confirme com o piscineiro.' },
+    { id: 'D', nome: 'Prainha + ofurô de canto', sub: 'Ofurô elevado no canto da parte funda, transbordando para a piscina.', h: 1220,
+      plan: planBase(DECK, AG) + R(100, 100, 120, 300, P1) + R(220, 100, 21, 300, P2) + R(241, 100, 21, 300, P3) + R(508, 100, 132, 132, SPAW) + R(520, 100, 120, 120, OF) + R(520, 100, 120, 20, '#fff', 'opacity=".35"') + R(620, 120, 20, 100, '#fff', 'opacity=".35"') + R(508, 232, 132, 6, '#fff', 'opacity=".7"') + chip2(160, 250, 'Prainha', '0,30 m') + chipC(385, 250, 'Profundidade 1,40 m') + chip2(580, 160, 'Ofurô', '2,00 × 2,00 m') + chip(500, 248, 'Transbordo') + chip(272, 112, '2 degraus') + chip(400, 50, 'Deck 1,00 m'),
+      cortes: [
+        { t: 'CORTE LONGITUDINAL (LADO DO OFURÔ)', svg: secBase() + R(94, 36, 132, 24, SHELL) + R(214, 36, 432, 90, SHELL) + R(100, 36, 120, 18, AG) + R(220, 36, 288, 84, AG) + steps(220) + R(508, 14, 138, 112, SHELL) + R(520, 18, 120, 54, OF) + R(502, 18, 6, 18, '#9fd8e8') + T(112, 78, '0,30 m') + dim(494, 36, 120) + T(440, 147, '1,40 m') + T(530, 147, ROW),
+          figs: [['chao', 108, -2, 'a'], ['chao', 172, 18, 'c'], ['pe', 315, 18, 'a'], ['pe', 425, 18, 'a'], ['banco', 524, -8, 'a'], ['banco', 584, -8, 'a', 1]], ag: [[100, 36, 120, 18], [220, 36, 288, 84], [520, 18, 120, 54, OF]] },
+        { t: 'CORTE LONGITUDINAL (LADO SEM OFURÔ)', svg: BCUT, figs: [['pe', 130, -12, 'c'], ['chao', 170, 18, 'c'], ['pe', 345, 18, 'a'], ['pe', 505, 18, 'a'], ['pe', 585, 18, 'a']], ag: [[100, 36, 120, 18], [220, 36, 420, 84]] }],
+      pessoas: [[140, 150, 'a'], [180, 350, 'a'], [190, 180, 'c'], [130, 320, 'c'], [195, 305, 'c'], [320, 180, 'a'], [450, 165, 'a'], [300, 340, 'a'], [440, 340, 'a'], [537, 118, 'a'], [622, 118, 'a'], [622, 202, 'a']],
+      vol: '49.000 litros', volDet: 'Piscina 46.000 L + ofurô 3.000 L', lot: '9 adultos + 3 crianças (3 no ofurô)',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Prainha', '2,00 × 5,00 m · 0,30 m'], ['Área funda', '1,40 m'], ['Ofurô', '2,00 × 2,00 m · 0,90 m'], ['Borda do ofurô', '0,30 m acima da água'], ['Filtro (ciclo 6 h)', '≈ 8 m³/h']],
+      nota: 'Com só 3 mil litros, o ofurô aquece rápido e pode ser usado o ano todo sem esquentar a piscina inteira. O transbordo ainda faz uma cascatinha para dentro da piscina.', rodape: RODAPE_OF },
+    { id: 'E', nome: 'Ofurô dentro da prainha', sub: 'O ofurô divide a cabeceira rasa com a prainha; a parte funda fica inteira.', h: 1220,
+      plan: planBase(DECK, AG) + R(100, 100, 120, 300, P1) + R(220, 100, 21, 300, P2) + R(241, 100, 21, 300, P3) + OFURO_CANTO + chip2(154, 154, 'Ofurô', '2,00 × 2,00') + chip2(160, 312, 'Prainha', '0,30 m') + chipC(436, 250, 'Profundidade 1,40 m') + chip(236, 112, 'Transbordo') + chip(272, 366, '2 degraus') + chip(540, 50, 'Deck 1,00 m'),
+      cortes: [
+        { t: 'CORTE LONGITUDINAL (LADO DO OFURÔ)', svg: secBase() + R(214, 36, 432, 90, SHELL) + R(220, 36, 420, 84, AG) + steps(220) + R(94, 14, 126, 64, SHELL) + R(100, 18, 108, 54, OF) + R(220, 18, 6, 18, '#9fd8e8') + T(70, 147, ROW) + dim(656, 36, 120) + T(652, 147, '1,40 m'),
+          figs: [['banco', 102, -8, 'a'], ['banco', 152, -8, 'a', 1], ['pe', 345, 18, 'a'], ['pe', 485, 18, 'a'], ['pe', 580, 18, 'a']], ag: [[220, 36, 420, 84], [100, 18, 108, 54, OF]] },
+        { t: 'CORTE LONGITUDINAL (LADO SEM OFURÔ)', svg: BCUT, figs: [['chao', 108, -2, 'a'], ['chao', 172, 18, 'c'], ['pe', 405, 18, 'a'], ['pe', 560, 18, 'a']], ag: [[100, 36, 120, 18], [220, 36, 420, 84]] }],
+      pessoas: [[117, 117, 'a'], [192, 117, 'a'], [117, 192, 'a'], [135, 370, 'a'], [195, 250, 'c'], [190, 365, 'c'], [320, 170, 'a'], [480, 160, 'a'], [380, 330, 'a'], [600, 170, 'a'], [560, 330, 'a']],
+      vol: '54.000 litros', volDet: 'Piscina 51.000 L + ofurô 3.000 L', lot: '9 adultos + 2 crianças (3 no ofurô)',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Ofurô', '2,00 × 2,00 m · 0,90 m'], ['Prainha livre', '2,00 × 3,00 m · 0,30 m'], ['Área funda', '7,00 × 5,00 m · 1,40 m'], ['Filtro (ciclo 6 h)', '≈ 8,5 m³/h']],
+      nota: 'A parte funda fica livre para nadar, e quem está no ofurô fica colado em quem está na prainha. Em troca, a prainha encolhe para 6 m²: cabe uma espreguiçadeira, talvez duas.', rodape: RODAPE_OF },
+    { id: 'F', nome: 'Ofurô + prainha ampliada', sub: 'A opção E com a cabeceira rasa em 2,50 m, para a prainha voltar a ter espaço.', h: 1220,
+      plan: planBase(DECK, AG) + R(100, 100, 150, 300, P1) + R(250, 100, 21, 300, P2) + R(271, 100, 21, 300, P3) + OFURO_CANTO + chip2(154, 154, 'Ofurô', '2,00 × 2,00') + chip2(175, 312, 'Prainha', '2,50 m · 0,30 m') + chipC(451, 250, 'Profundidade 1,40 m') + chip(300, 112, '2 degraus') + chip(540, 50, 'Deck 1,00 m'),
+      cortes: [
+        { t: 'CORTE LONGITUDINAL (LADO DO OFURÔ)', svg: secBase() + R(214, 36, 42, 24, SHELL) + R(244, 36, 402, 90, SHELL) + R(220, 36, 30, 18, AG) + R(250, 36, 390, 84, AG) + steps(250) + R(94, 14, 126, 64, SHELL) + R(100, 18, 108, 54, OF) + R(220, 18, 6, 18, '#9fd8e8') + T(70, 147, ROW) + dim(656, 36, 120) + T(652, 147, '1,40 m'),
+          figs: [['banco', 102, -8, 'a'], ['banco', 152, -8, 'a', 1], ['pe', 225, -12, 'c'], ['pe', 365, 18, 'a'], ['pe', 505, 18, 'a']], ag: [[220, 36, 30, 18], [250, 36, 390, 84], [100, 18, 108, 54, OF]] },
+        { t: 'CORTE LONGITUDINAL (LADO SEM OFURÔ)', svg: secBase() + R(94, 36, 162, 24, SHELL) + R(244, 36, 402, 90, SHELL) + R(100, 36, 150, 18, AG) + R(250, 36, 390, 84, AG) + steps(250) + T(112, 78, '0,30 m') + dim(656, 36, 120) + T(652, 147, '1,40 m'),
+          figs: [['chao', 108, -2, 'a'], ['chao', 175, 18, 'c'], ['pe', 222, -12, 'c'], ['pe', 385, 18, 'a'], ['pe', 560, 18, 'a']], ag: [[100, 36, 150, 18], [250, 36, 390, 84]] }],
+      pessoas: [[117, 117, 'a'], [192, 117, 'a'], [117, 192, 'a'], [140, 370, 'a'], [235, 170, 'a'], [200, 250, 'c'], [215, 370, 'c'], [125, 255, 'c'], [340, 180, 'a'], [500, 170, 'a'], [420, 340, 'a'], [590, 300, 'a']],
+      vol: '51.000 litros', volDet: 'Piscina 48.000 L + ofurô 3.000 L', lot: '9 adultos + 3 crianças (3 no ofurô)',
+      specs: [['Medidas internas', '9,00 × 5,00 m'], ['Ofurô', '2,00 × 2,00 m · 0,90 m'], ['Prainha livre', '≈ 8,5 m² · 0,30 m'], ['Área funda', '6,50 × 5,00 m · 1,40 m'], ['Filtro (ciclo 6 h)', '≈ 8 m³/h']],
+      nota: 'A prainha volta a ter espaço para duas espreguiçadeiras e criança brincando, o ofurô continua colado nela e a parte funda ainda passa de 6 m livres.', rodape: RODAPE_OF }
+  ];
+
+  var PELE = ['#f1c7a4', '#a8704c', '#d9a17a', '#7a4a2e', '#e8b48f', '#c68a62'];
+  var CAB = ['#2b1d16', '#b8863b', '#1a1a1a', '#5a3a22', '#3d2a1e', '#8a5a2b'];
+  var ROUPA = ['#e2692c', '#2a6f8f', '#c2185b', '#1d2a33', '#7b9e3a', '#6a4c93'];
+  var ROT = [0, 35, -20, 160, 90, -60, 200, 15, -110, 60, 130, -35];
+
+  function topo(q, i) {
+    var kid = q[2] === 'c', s = kid ? 26 : 34, p = PELE[i % PELE.length], c = CAB[(i + 2) % CAB.length];
+    var boia = kid ? '<circle cx="7.5" cy="24.5" r="4.2" fill="#ffd23f" stroke="#d49a00" stroke-width="1"/><circle cx="32.5" cy="24.5" r="4.2" fill="#ffd23f" stroke="#d49a00" stroke-width="1"/>' : '';
+    return '<g transform="translate(' + (q[0] - s / 2) + ' ' + (q[1] - s / 2) + ') rotate(' + ROT[i % ROT.length] + ' ' + s / 2 + ' ' + s / 2 + ')" filter="url(#sh)"><svg width="' + s + '" height="' + s + '" viewBox="0 0 40 40">' +
+      '<circle cx="20" cy="21" r="18" fill="none" stroke="#fff" stroke-opacity="0.65" stroke-width="1.5"/>' +
+      '<ellipse cx="20" cy="31" rx="6" ry="8" fill="' + p + '" fill-opacity="0.35"/>' +
+      '<ellipse cx="7.5" cy="26" rx="3.2" ry="5.5" fill="' + p + '" transform="rotate(-25 7.5 26)"/><ellipse cx="32.5" cy="26" rx="3.2" ry="5.5" fill="' + p + '" transform="rotate(25 32.5 26)"/>' +
+      '<ellipse cx="20" cy="23.5" rx="11" ry="5" fill="' + p + '"/>' + boia +
+      '<circle cx="20" cy="19.5" r="6.5" fill="' + p + '"/><circle cx="20" cy="18" r="6" fill="' + c + '"/></svg></g>';
+  }
+
+  function perfil(q, i) {
+    var t = q[0], x = q[1], y = q[2], k = q[3] === 'c' ? 0.65 : 1, flip = q[4];
+    var d = t === 'pe' ? [31, 102, '0 0 30 100'] : t === 'chao' ? [60, 56, '0 0 60 56'] : [54, 69, '0 0 44 56'];
+    var w = Math.round(d[0] * k), h = Math.round(d[1] * k);
+    var p = PELE[(i + 1) % PELE.length], c = CAB[(i + 3) % CAB.length], r = ROUPA[i % ROUPA.length], maio = i % 2 === 1;
+    var corpo;
+    if (t === 'pe') {
+      corpo = '<rect x="1.5" y="20" width="5" height="32" rx="2.5" fill="' + p + '"/><rect x="23.5" y="20" width="5" height="32" rx="2.5" fill="' + p + '"/>' +
+        '<rect x="8" y="52" width="6.5" height="47" rx="3" fill="' + p + '"/><rect x="15.5" y="52" width="6.5" height="47" rx="3" fill="' + p + '"/>' +
+        '<rect x="12.75" y="12.5" width="4.5" height="7" fill="' + p + '"/><rect x="6.5" y="18" width="17" height="36" rx="6" fill="' + p + '"/>' +
+        '<rect x="6.5" y="' + (maio ? 21 : 44) + '" width="17" height="' + (maio ? 34 : 12) + '" rx="4" fill="' + r + '"/>' +
+        '<circle cx="15" cy="7" r="6.8" fill="' + p + '"/><path d="M8.2 7a6.8 6.8 0 0 1 13.6 0z" fill="' + c + '"/>';
+    } else if (t === 'chao') {
+      corpo = '<rect x="2" y="22" width="5" height="32" rx="2.5" fill="' + p + '" stroke="rgba(0,0,0,0.18)" stroke-width="0.8" transform="rotate(12 4.5 22)"/>' +
+        '<rect x="16" y="45" width="40" height="9" rx="4.5" fill="' + p + '"/><rect x="6" y="15" width="15" height="34" rx="6" fill="' + p + '"/>' +
+        '<rect x="6" y="38" width="22" height="16" rx="5" fill="' + r + '"/><rect x="11" y="10" width="5" height="7" fill="' + p + '"/>' +
+        '<circle cx="13.5" cy="8" r="7.5" fill="' + p + '"/><path d="M6 8a7.5 7.5 0 0 1 15 0z" fill="' + c + '"/>';
+    } else {
+      corpo = '<rect x="6" y="15" width="15" height="28" rx="6" fill="' + p + '"/><rect x="10" y="34" width="26" height="9" rx="4.5" fill="' + p + '"/>' +
+        '<rect x="29" y="34" width="8" height="22" rx="4" fill="' + p + '"/><rect x="6" y="32" width="20" height="11" rx="4" fill="' + r + '"/>' +
+        '<rect x="15" y="19" width="5" height="20" rx="2.5" fill="' + p + '" stroke="rgba(0,0,0,0.18)" stroke-width="0.8" transform="rotate(-30 17.5 19)"/>' +
+        '<rect x="11" y="10" width="5" height="7" fill="' + p + '"/><circle cx="13.5" cy="8" r="7.5" fill="' + p + '"/><path d="M6 8a7.5 7.5 0 0 1 15 0z" fill="' + c + '"/>';
+    }
+    var tr = flip ? ' transform="translate(' + (2 * x + w) + ' 0) scale(-1 1)"' : '';
+    return '<g filter="url(#sh)"' + tr + '><svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" viewBox="' + d[2] + '" preserveAspectRatio="none">' + corpo + '</svg></g>';
+  }
+
+  function aguaOv(a) {
+    if (a.poly) return '<polygon points="' + a.poly + '" fill="' + a.c + '" opacity="0.55"/>';
+    return R(a[0], a[1], a[2], a[3], a[4] || AG, 'opacity="0.55"');
+  }
+
+  var LEG = '<div class="l"><span><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="7.5" cy="26" rx="3.2" ry="5.5" fill="#d9a17a" transform="rotate(-25 7.5 26)"/><ellipse cx="32.5" cy="26" rx="3.2" ry="5.5" fill="#d9a17a" transform="rotate(25 32.5 26)"/><ellipse cx="20" cy="23.5" rx="11" ry="5" fill="#d9a17a"/><circle cx="20" cy="19.5" r="6.5" fill="#d9a17a"/><circle cx="20" cy="18" r="6" fill="#2b1d16"/></svg>Adulto (1,70 m)</span>' +
+    '<span><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="23.5" rx="11" ry="5" fill="#e8b48f"/><circle cx="7.5" cy="24.5" r="4.2" fill="#ffd23f" stroke="#d49a00"/><circle cx="32.5" cy="24.5" r="4.2" fill="#ffd23f" stroke="#d49a00"/><circle cx="20" cy="19.5" r="6.5" fill="#e8b48f"/><circle cx="20" cy="18" r="6" fill="#b8863b"/></svg>Criança (1,10 m)</span></div>';
+
+  var com = OPC.map(function () { return true; });
+  var world = document.getElementById('world'), vp = document.getElementById('vp');
+
+  function boardInner(i) {
+    var o = OPC[i], on = com[i];
+    var h = '<div class="faixa">Opção ' + o.id + ' — ' + o.nome + '</div><div class="bin">' +
+      '<div><div class="eyebrow">OPÇÃO ' + o.id + '</div><h2>' + o.nome + '</h2><p class="sub">' + o.sub + '</p></div>' +
+      '<div class="tog"><div class="seg" role="group" aria-label="Simulação de uso">' +
+      '<button type="button" data-b="' + i + '" data-v="1" aria-pressed="' + on + '">Simulação com pessoas</button>' +
+      '<button type="button" data-b="' + i + '" data-v="0" aria-pressed="' + !on + '">Sem pessoas</button></div>' +
+      (on ? '<div class="leg">' + LEG + '<div style="font-weight:700">Confortável: ' + o.lot + '</div></div>' : '') + '</div>' +
+      '<div class="linha"><div class="esq"><h3>PLANTA (VISTA DE CIMA)</h3><svg width="700" height="460" viewBox="0 0 700 460" role="img" aria-label="Planta da opção ' + o.id + '">' + o.plan + (on ? o.pessoas.map(topo).join('') : '') + '</svg>';
+    o.cortes.forEach(function (c) {
+      h += '<h3 class="c">' + c.t + '</h3><svg width="700" height="190" viewBox="0 -24 700 190" role="img" aria-label="' + c.t.toLowerCase() + '">' + c.svg + (on ? c.figs.map(perfil).join('') + c.ag.map(aguaOv).join('') : '') + '</svg>';
+    });
+    h += '</div><aside><div class="volume"><div class="rot">VOLUME DE ÁGUA</div><div class="num">' + o.vol + '</div><div class="det">' + o.volDet + '</div></div>' +
+      '<dl>' + o.specs.map(function (s) { return '<div><dt>' + s[0] + '</dt><dd>' + s[1] + '</dd></div>'; }).join('') + '</dl>' +
+      '<p class="nota">' + o.nota + '</p><p class="rodape">' + o.rodape + '</p></aside></div></div>';
+    return h;
+  }
+
+  var boards = OPC.map(function (o, i) {
+    var b = document.createElement('div');
+    b.className = 'board'; b.style.left = (i * 1280) + 'px'; b.style.height = o.h + 'px';
+    b.innerHTML = boardInner(i);
+    world.appendChild(b);
+    return b;
+  });
+
+  world.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-b]');
+    if (!btn || moved) return;
+    var i = +btn.getAttribute('data-b');
+    com[i] = btn.getAttribute('data-v') === '1';
+    boards[i].innerHTML = boardInner(i);
+  });
+
+  // ---------- pan & zoom ----------
+  var s = 0.3, tx = 0, ty = 0, TOP = 64;
+  var W_ALL = 6 * 1280 - 80, H_ALL = 1220, Y_MIN = -200;
+  function apply() { world.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')'; }
+  function clampS(v) { return Math.max(0.05, Math.min(3, v)); }
+  function zoomAt(f, cx, cy) { var ns = clampS(s * f); tx = cx - (cx - tx) * ns / s; ty = cy - (cy - ty) * ns / s; s = ns; apply(); }
+  function fitAll() {
+    var W = vp.clientWidth, H = vp.clientHeight - TOP, pad = 32;
+    s = clampS(Math.min((W - pad * 2) / W_ALL, (H - pad * 2) / (H_ALL - Y_MIN)));
+    tx = (W - W_ALL * s) / 2; ty = TOP + pad - Y_MIN * s; apply();
+  }
+  function focus(i) {
+    var W = vp.clientWidth, H = vp.clientHeight - TOP, pad = 16, bh = OPC[i].h;
+    s = clampS(Math.min((W - pad * 2) / 1200, (H - pad * 2 - 40) / bh));
+    if (W < 700) s = clampS((W - pad * 2) / 1200);
+    tx = W / 2 - (i * 1280 + 600) * s; ty = TOP + pad + 40 * s; apply();
+  }
+
+  var ctr = document.getElementById('ctr');
+  OPC.forEach(function (o, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = o.id; b.setAttribute('aria-label', 'Ir para a opção ' + o.id);
+    b.addEventListener('click', function () { focus(i); }); ctr.appendChild(b);
+  });
+  document.getElementById('fit').addEventListener('click', fitAll);
+  document.getElementById('zIn').addEventListener('click', function () { zoomAt(1.25, vp.clientWidth / 2, vp.clientHeight / 2); });
+  document.getElementById('zOut').addEventListener('click', function () { zoomAt(0.8, vp.clientWidth / 2, vp.clientHeight / 2); });
+
+  vp.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    if (e.ctrlKey) { zoomAt(Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY); return; }
+    var mouse = e.deltaMode !== 0 || (e.deltaX === 0 && Math.abs(e.deltaY) >= 50);
+    if (mouse) { zoomAt(Math.exp(-e.deltaY * 0.0015 * (e.deltaMode ? 33 : 1)), e.clientX, e.clientY); return; }
+    tx -= e.deltaX; ty -= e.deltaY; apply();
+  }, { passive: false });
+
+  var pts = {}, last = null, pinch = null, moved = false, downAt = null, lastTap = 0;
+  vp.addEventListener('pointerdown', function (e) {
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pts);
+    if (ids.length === 1) { last = { x: e.clientX, y: e.clientY }; downAt = { x: e.clientX, y: e.clientY }; moved = false; }
+    if (ids.length === 2) {
+      var a = pts[ids[0]], b = pts[ids[1]];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s: s }; moved = true;
+    }
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!pts[e.pointerId]) return;
+    pts[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(pts);
+    if (ids.length >= 2 && pinch) {
+      var a = pts[ids[0]], b = pts[ids[1]], d = Math.hypot(a.x - b.x, a.y - b.y);
+      var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      zoomAt((pinch.s * d / pinch.d) / s, mx, my);
+      if (last) { tx += mx - last.x; ty += my - last.y; apply(); }
+      last = { x: mx, y: my };
+      return;
+    }
+    if (last) {
+      if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 6) { moved = true; vp.classList.add('arrastando'); }
+      if (moved) { tx += e.clientX - last.x; ty += e.clientY - last.y; apply(); }
+      last = { x: e.clientX, y: e.clientY };
+    }
+  });
+  function up(e) {
+    if (!pts[e.pointerId]) return;
+    delete pts[e.pointerId];
+    var ids = Object.keys(pts);
+    if (ids.length < 2) pinch = null;
+    if (ids.length === 1) { last = { x: pts[ids[0]].x, y: pts[ids[0]].y }; return; }
+    if (ids.length === 0) {
+      vp.classList.remove('arrastando');
+      if (!moved && !e.target.closest('button')) {
+        var now = Date.now();
+        if (now - lastTap < 320) { var bd = e.target.closest('.board'); if (bd) focus(boards.indexOf(bd)); }
+        lastTap = now;
+      }
+      last = null; downAt = null;
+      setTimeout(function () { moved = false; }, 0);
+    }
+  }
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+  window.addEventListener('resize', function () { apply(); });
+
+  if (window.innerWidth < 700) focus(0); else fitAll();
+  setTimeout(function () { document.getElementById('dica').style.opacity = '0'; }, 5000);
+})();
+</script>
+</body>
+</html>
